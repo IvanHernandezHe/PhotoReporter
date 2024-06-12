@@ -51,7 +51,7 @@ def agregar_encabezado(doc, logo_path):
 
 
 
-def agregar_tabla_informacion(doc,textoAsignacion,fechaHoy):
+def agregar_tabla_informacion(doc, textoAsignacion, fechaHoy):
     info_table = doc.add_table(rows=1, cols=2)
     info_table.style = 'Medium List 1 Accent 1'
 
@@ -59,7 +59,7 @@ def agregar_tabla_informacion(doc,textoAsignacion,fechaHoy):
 
     # Asignación de texto y estilo a la primera celda
     p0 = hdr_cells[0].paragraphs[0]
-    run0 = p0.add_run('Asignación: '+textoAsignacion)
+    run0 = p0.add_run('Asignación: ' + textoAsignacion)
     run0.font.name = 'Segoe UI'
     run0.font.size = Pt(10)
     run0.bold = False
@@ -67,26 +67,23 @@ def agregar_tabla_informacion(doc,textoAsignacion,fechaHoy):
 
     # Asignación de texto y estilo a la segunda celda
     p1 = hdr_cells[1].paragraphs[0]
-    run1 = p1.add_run('Fecha: '+fechaHoy)
+    run1 = p1.add_run('Fecha: ' + fechaHoy)
     run1.font.name = 'Segoe UI'
     run1.font.size = Pt(10)
     run1.font.color.rgb = RGBColor(13, 85, 137)
     run1.bold = False
 
     # Ajustar el ancho de las celdas (opcional)
-    hdr_cells[0].width = Inches(17)  # Ajusta el valor según sea necesario
-    #hdr_cells[1].width = Inches(1)  # Ajusta el valor según sea necesario
+    hdr_cells[0].width = Inches(8)  # Ajusta el valor según sea necesario
+    hdr_cells[1].width = Inches(1.6)  # Ajusta el valor según sea necesario
 
-    hdr_cells[0].alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
+    # Alinear el texto 
+    p0.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
+    p1.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
+
+    # Centrar verticalmente el texto en las celdas
     hdr_cells[0].vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
-    hdr_cells[1].alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
     hdr_cells[1].vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
-
-
-    # # Centrar verticalmente el texto en las celdas
-    # for cell in hdr_cells:
-    #     cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
-
 
 def guardar_documento(doc, filename):
     doc.save(filename)
@@ -102,7 +99,7 @@ def main():
     logo_path = seleccionar_imagen()
 
     #Se obtiene el titulo del reporte
-    textoAsignacion = 'Instalación de purga en red de aire general de linea D de la nave 1 Instalación de purga en red de aire general de linea D de la nave 1 Instalación de purga en red de aire general de linea D de la nave 1'
+    textoAsignacion = 'Instalación de purga en red de aire general de linea D de la nave 1'
 
     #Se obtiene la fecha del día actual
     current_dateTime = datetime.now()
@@ -117,6 +114,12 @@ def main():
     
     #Se crea infomación del reporte con titulo y día
     agregar_tabla_informacion(doc,textoAsignacion,fechaHoy)
+
+
+    #Se crea tabla con imagenes
+    doc.add_paragraph()
+
+
 
     docx_filename = 'ReporteConEncabezadoYMargenes.docx'
     pdf_filename = 'ReporteConEncabezadoYMargenes.pdf'
