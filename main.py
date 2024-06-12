@@ -5,7 +5,7 @@ from docx.shared import Inches, Pt
 from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
-import pypandoc
+from datetime import datetime
 
 from datetime import datetime
 
@@ -14,6 +14,18 @@ def seleccionar_imagen():
     #ruta_imagen = 'files/logo.png'
     ruta_imagen = 'files/logo3.png'
     return ruta_imagen
+
+
+def seleccionar_imagenes():
+    root = tk.Tk()
+    root.withdraw()  # Oculta la ventana principal de tkinter
+
+    # Abre el explorador de archivos para seleccionar múltiples imágenes
+    rutas_imagenes = filedialog.askopenfilenames(title="Seleccionar imágenes", filetypes=[("Imágenes", "*.jpg;*.jpeg;*.png")])
+
+    return rutas_imagenes
+
+
 
 def configurar_margenes(doc):
     sections = doc.sections
@@ -85,6 +97,21 @@ def agregar_tabla_informacion(doc, textoAsignacion, fechaHoy):
     hdr_cells[0].vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
     hdr_cells[1].vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
 
+
+def agregar_tabla_con_imagenes(doc, rutas_imagenes):
+    table = doc.add_table(rows=3, cols=3)
+    table.style = 'Table Grid'
+
+    index = 0
+    for row in table.rows:
+        for cell in row.cells:
+            if index < len(rutas_imagenes):
+                paragraph = cell.add_paragraph()
+                run = paragraph.add_run()
+                run.add_picture(rutas_imagenes[index], width=Inches(2.0))
+                index += 1
+
+
 def guardar_documento(doc, filename):
     doc.save(filename)
     print(f"Documento guardado como '{filename}'")
@@ -93,10 +120,15 @@ def convertir_a_pdf(input_file, output_file):
     # pypandoc.convert_file(input_file, 'pdf', outputfile=output_file)
     print(f"Documento guardado como '{output_file}'")
 
+
+
 def main():
 
-    #Se obtiene una imagen
+    #Se obtiene una imagen para logo
     logo_path = seleccionar_imagen()
+
+    #se obtienen las imagenes a agregar en el reporte
+    rutas_imagenes = seleccionar_imagenes()
 
     #Se obtiene el titulo del reporte
     textoAsignacion = 'Instalación de purga en red de aire general de linea D de la nave 1'
@@ -118,6 +150,7 @@ def main():
 
     #Se crea tabla con imagenes
     doc.add_paragraph()
+    agregar_tabla_con_imagenes(doc, rutas_imagenes[1:])  # Excluimos el primer elemento (logo) de las imágenes
 
 
 
