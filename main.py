@@ -2,9 +2,13 @@ import tkinter as tk
 from tkinter import filedialog
 from docx import Document
 from docx.shared import Inches, Pt
+from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 import pypandoc
+
+from datetime import datetime
+
 
 def seleccionar_imagen():
     #ruta_imagen = 'files/logo.png'
@@ -32,7 +36,7 @@ def agregar_encabezado(doc, logo_path):
     paragraph_logo.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
     #paragraph_logo.alignment = WD_PARAGRAPH_ALIGNMENT.JUSTIFY_MED
     run_logo = paragraph_logo.add_run()
-    run_logo.add_picture(logo_path, width=Inches(3))
+    run_logo.add_picture(logo_path, width=Inches(2.9))
     cell_logo.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
 
     cell_info = header_table.cell(0, 1)
@@ -42,16 +46,47 @@ def agregar_encabezado(doc, logo_path):
     run.bold = True
     run.font.name = 'Segoe UI'
     run.font.size = Pt(10.2)
+    run.font.color.rgb = RGBColor(13, 85, 137)
     cell_info.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
 
-def agregar_tabla_informacion(doc):
+
+
+def agregar_tabla_informacion(doc,textoAsignacion,fechaHoy):
     info_table = doc.add_table(rows=1, cols=2)
     info_table.style = 'Medium List 1 Accent 1'
 
     hdr_cells = info_table.rows[0].cells
-    hdr_cells[0].text = 'Asignación:'
-    hdr_cells[0].width = Inches(10)
-    hdr_cells[1].text = 'Fecha:'
+
+    # Asignación de texto y estilo a la primera celda
+    p0 = hdr_cells[0].paragraphs[0]
+    run0 = p0.add_run('Asignación: '+textoAsignacion)
+    run0.font.name = 'Segoe UI'
+    run0.font.size = Pt(10)
+    run0.bold = False
+    run0.font.color.rgb = RGBColor(13, 85, 137)
+
+    # Asignación de texto y estilo a la segunda celda
+    p1 = hdr_cells[1].paragraphs[0]
+    run1 = p1.add_run('Fecha: '+fechaHoy)
+    run1.font.name = 'Segoe UI'
+    run1.font.size = Pt(10)
+    run1.font.color.rgb = RGBColor(13, 85, 137)
+    run1.bold = False
+
+    # Ajustar el ancho de las celdas (opcional)
+    hdr_cells[0].width = Inches(17)  # Ajusta el valor según sea necesario
+    #hdr_cells[1].width = Inches(1)  # Ajusta el valor según sea necesario
+
+    hdr_cells[0].alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
+    hdr_cells[0].vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
+    hdr_cells[1].alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
+    hdr_cells[1].vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
+
+
+    # # Centrar verticalmente el texto en las celdas
+    # for cell in hdr_cells:
+    #     cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
+
 
 def guardar_documento(doc, filename):
     doc.save(filename)
@@ -62,13 +97,26 @@ def convertir_a_pdf(input_file, output_file):
     print(f"Documento guardado como '{output_file}'")
 
 def main():
+
+    #Se obtiene una imagen
     logo_path = seleccionar_imagen()
 
+    #Se obtiene el titulo del reporte
+    textoAsignacion = 'Instalación de purga en red de aire general de linea D de la nave 1 Instalación de purga en red de aire general de linea D de la nave 1 Instalación de purga en red de aire general de linea D de la nave 1'
+
+    #Se obtiene la fecha del día actual
+    current_dateTime = datetime.now()
+    fechaHoy = f"{current_dateTime.day:02d}/{current_dateTime.month:02d}/{current_dateTime.year}"
+
+    #Se crea un documento word
     doc = Document()
     configurar_margenes(doc)
+
+    #Se crea header
     agregar_encabezado(doc, logo_path)
-    # doc.add_paragraph('')
-    agregar_tabla_informacion(doc)
+    
+    #Se crea infomación del reporte con titulo y día
+    agregar_tabla_informacion(doc,textoAsignacion,fechaHoy)
 
     docx_filename = 'ReporteConEncabezadoYMargenes.docx'
     pdf_filename = 'ReporteConEncabezadoYMargenes.pdf'
