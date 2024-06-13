@@ -2,5 +2,6 @@
 
 #install libraries
 python-docx
+pyTelegramBotAPI
 
 parametro distribuidor de imagenes
