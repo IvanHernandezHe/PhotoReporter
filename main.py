@@ -7,14 +7,10 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
 from datetime import datetime
 
-from datetime import datetime
-
-
 def seleccionar_imagen():
     #ruta_imagen = 'files/logo.png'
     ruta_imagen = 'files/logo3.png'
     return ruta_imagen
-
 
 def seleccionar_imagenes():
     root = tk.Tk()
@@ -24,8 +20,6 @@ def seleccionar_imagenes():
     rutas_imagenes = filedialog.askopenfilenames(title="Seleccionar imágenes", filetypes=[("Imágenes", "*.jpg;*.jpeg;*.png")])
 
     return rutas_imagenes
-
-
 
 def configurar_margenes(doc):
     sections = doc.sections
@@ -61,8 +55,6 @@ def agregar_encabezado(doc, logo_path):
     run.font.color.rgb = RGBColor(13, 85, 137)
     cell_info.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
 
-
-
 def agregar_tabla_informacion(doc, textoAsignacion, fechaHoy):
     info_table = doc.add_table(rows=1, cols=2)
     info_table.style = 'Medium List 1 Accent 1'
@@ -97,18 +89,46 @@ def agregar_tabla_informacion(doc, textoAsignacion, fechaHoy):
     hdr_cells[0].vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
     hdr_cells[1].vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.TOP
 
+from docx.shared import Inches
 
 def agregar_tabla_con_imagenes(doc, rutas_imagenes):
-    table = doc.add_table(rows=3, cols=3)
-    table.style = 'Table Grid'
+    num_imagenes = len(rutas_imagenes)
+    
+    # Determinar el tamaño de la tabla
+    if num_imagenes <= 2:
+        rows = 2
+        cols = 2
+    elif num_imagenes <= 4:
+        rows = 3
+        cols = 2
+    else:
+        rows = ((num_imagenes - 1) // 3) + 2  # +2 porque dejamos la primera fila vacía y contamos la fila adicional necesaria
+        cols = 3
+    
+    #4*4 y 6*5
+
+    # Crear tabla
+    table = doc.add_table(rows=rows, cols=cols)
+    table.style = 'Light List Accent 1'
+
+    # Calcular el ancho y alto de las celdas
+    if num_imagenes <= 4:
+        cell_width = Inches(3)
+        cell_height = Inches(4)
+    else:
+        cell_width = Inches(1.5)
+        cell_height = Inches(2.6)
 
     index = 0
-    for row in table.rows:
+    # Comenzar desde la segunda fila (índice 1)
+    for i, row in enumerate(table.rows):
+        if i == 0:
+            continue  # Saltar la primera fila
         for cell in row.cells:
             if index < len(rutas_imagenes):
                 paragraph = cell.add_paragraph()
                 run = paragraph.add_run()
-                run.add_picture(rutas_imagenes[index], width=Inches(2.0))
+                run.add_picture(rutas_imagenes[index], width=cell_width, height=cell_height)
                 index += 1
 
 
@@ -150,7 +170,7 @@ def main():
 
     #Se crea tabla con imagenes
     doc.add_paragraph()
-    agregar_tabla_con_imagenes(doc, rutas_imagenes[1:])  # Excluimos el primer elemento (logo) de las imágenes
+    agregar_tabla_con_imagenes(doc, rutas_imagenes[:])  # Excluimos el primer elemento (logo) de las imágenes
 
 
 
